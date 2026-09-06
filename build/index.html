@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><script defer src="assets/analytics.supai.app/script.js" data-website-id="9e6c8b1f-7167-4635-b0c2-ea24e3931ac6"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI文本测评系统 V2.0</title>
+<style>
+:root{
+  --green:#1f5d43;--green2:#2e7558;--green3:#eaf2ed;--ink:#1e2923;--muted:#68756e;
+  --line:#d7dfda;--bg:#eef2ef;--paper:#fff;--warn:#9b6c18;--danger:#8d4545;--blue:#456c86;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Microsoft YaHei","PingFang SC","Noto Sans CJK SC",Arial,sans-serif}
+button,input,select,textarea{font:inherit}
+.top{background:var(--paper);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+.wrap{max-width:1500px;margin:auto;padding:16px 22px}
+.brandrow{display:flex;justify-content:space-between;gap:20px;align-items:center}
+.brand h1{font-size:23px;margin:0 0 4px;color:#173f30}
+.brand .sub{font-size:12.5px;color:var(--muted);line-height:1.65}
+.version{padding:5px 10px;border:1px solid #b8c9bf;border-radius:20px;color:var(--green);font-size:12px;white-space:nowrap}
+.tabs{display:flex;gap:3px;margin-top:12px;flex-wrap:wrap}
+.tabbtn{border:0;background:transparent;padding:9px 13px;color:#506158;cursor:pointer;border-bottom:3px solid transparent}
+.tabbtn.active{color:var(--green);font-weight:700;border-bottom-color:var(--green)}
+.page{display:none}
+.page.active{display:block}
+.notice{border-left:4px solid var(--green);padding:10px 12px;background:#f7faf8;border-radius:3px;font-size:12.5px;line-height:1.7;margin-bottom:14px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+button{border:1px solid #b8c5bd;background:#fff;color:#24342b;border-radius:5px;padding:8px 12px;cursor:pointer;font-size:12.5px}
+button.primary{background:var(--green);color:#fff;border-color:var(--green)}
+button.soft{background:#f4f8f5;border-color:#cad7cf;color:var(--green)}
+button.danger{color:var(--danger)}
+button:hover{filter:brightness(.98)}
+.meta{display:grid;grid-template-columns:1.7fr 1fr 1fr;gap:10px;margin-bottom:12px}
+.field label{display:block;font-size:11.5px;color:var(--muted);margin:0 0 5px}
+.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);background:#fff;border-radius:5px;padding:8px 9px;color:var(--ink);outline:none}
+.field textarea{min-height:84px;resize:vertical}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.card,.panel,.scorecard{background:#fff;border:1px solid var(--line);border-radius:7px;box-shadow:0 1px 2px rgba(25,50,35,.025)}
+.card-h{padding:11px 12px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.model{font-weight:700;color:#234a37}
+.pill{font-size:11px;border:1px solid #cbd5cf;border-radius:16px;padding:3px 7px;color:#6a776f}
+.textbox{width:100%;height:285px;border:0;resize:vertical;padding:12px;outline:0;font-size:12.5px;line-height:1.7;color:#26342d;background:#fff}
+.filebar{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:8px 10px;border-top:1px solid var(--line);font-size:11px;color:var(--muted)}
+.filebar input{max-width:180px;font-size:11px}
+.section{margin-top:16px}
+.section h2{font-size:17px;margin:0 0 9px;color:#173f30}
+.scorecards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.scorecard{padding:14px;position:relative}
+.scorecard.winner{border:2px solid var(--green)}
+.tag{position:absolute;right:10px;top:10px;background:var(--green);color:#fff;font-size:10.5px;padding:3px 6px;border-radius:3px}
+.bigscore{font-size:36px;font-weight:700;color:var(--green);line-height:1;margin-top:7px}
+.bigscore small{font-size:13px;color:var(--muted);font-weight:400}
+.autoline{font-size:11.5px;color:var(--muted);margin-top:6px}
+.bar{height:7px;background:#e8edea;border-radius:2px;overflow:hidden;margin-top:9px}
+.bar i{display:block;height:100%;background:var(--green)}
+.dash{display:grid;grid-template-columns:1.05fr .95fr;gap:12px}
+.panel{padding:13px}
+.panel h3{font-size:14px;margin:0 0 9px;color:#234a37}
+table{width:100%;border-collapse:collapse;font-size:12px;background:#fff}
+th,td{border-bottom:1px solid var(--line);padding:8px 8px;text-align:left;vertical-align:top}
+th{background:#f5f8f6;color:#315241;font-weight:700}
+td.num{text-align:center;font-variant-numeric:tabular-nums}
+.best{font-weight:700;color:var(--green)}
+.radarWrap{display:flex;align-items:center;justify-content:center;min-height:450px}
+svg{max-width:100%;height:auto}
+.reason{font-size:11.5px;line-height:1.7;color:#495b51}
+.evidence{display:inline-block;padding:3px 6px;margin:3px 4px 3px 0;background:#f4f7f4;border:1px solid #d7e0da;border-radius:3px}
+.deduct{color:var(--danger);background:#fbf5f5;border-color:#ead5d5}
+.warn{color:var(--warn)}
+.detailHead{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end;margin-bottom:12px}
+.detailGrid{display:grid;grid-template-columns:.85fr 1.15fr;gap:12px}
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px}
+.kpi{border:1px solid var(--line);border-radius:6px;padding:10px;background:#fbfcfb}
+.kpi b{display:block;font-size:22px;color:var(--green)}
+.kpi span{font-size:11px;color:var(--muted)}
+.dimlist .dimrow{padding:10px 0;border-top:1px solid var(--line)}
+.dimlist .dimrow:first-child{border-top:0}
+.dimtitle{display:flex;justify-content:space-between;gap:10px;font-weight:700;color:#315241;font-size:12.5px}
+.miniBar{height:5px;background:#edf1ee;margin:6px 0;border-radius:2px;overflow:hidden}
+.miniBar i{display:block;height:100%;background:var(--green2)}
+.expertLayout{display:grid;grid-template-columns:.72fr 1.28fr;gap:12px}
+.expertForm{background:#fff;border:1px solid var(--line);border-radius:7px;padding:13px}
+.expertTable input[type=number]{width:72px;padding:6px;border:1px solid var(--line);border-radius:4px}
+.expertTable input[type=text]{width:100%;min-width:180px;padding:6px;border:1px solid var(--line);border-radius:4px}
+.finalBox{padding:12px;background:#f6faf7;border:1px solid #d8e4dc;border-radius:6px;margin-top:10px}
+.finalBox b{font-size:26px;color:var(--green)}
+.audit{font-size:11.5px;color:#536159;line-height:1.65}
+.audit .item{padding:7px 0;border-top:1px dashed #dbe2dd}
+.audit .item:first-child{border-top:0}
+.method{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.method .m{background:#fff;border:1px solid var(--line);padding:12px;border-radius:6px;font-size:11.5px;line-height:1.65}
+.method b{display:block;color:#234a37;margin-bottom:4px}
+.reportPreview{background:#fff;border:1px solid var(--line);border-radius:7px;padding:18px}
+.reportTitle{text-align:center;margin-bottom:14px}
+.reportTitle h2{margin:0;color:#173f30;font-size:20px}
+.reportTitle p{margin:5px 0 0;color:var(--muted);font-size:11.5px}
+.foot{font-size:11px;color:var(--muted);line-height:1.7;padding:16px 0 28px}
+.hidden{display:none!important}
+@media(max-width:1050px){
+  .grid3,.scorecards,.dash,.detailGrid,.expertLayout,.method,.meta{grid-template-columns:1fr}
+  .textbox{height:220px}.top{position:static}
+}
+@media print{
+  .top,.no-print,.inputArea{display:none!important}
+  body{background:#fff}
+  .wrap{max-width:none;padding:0}
+  .page{display:block!important}
+  .page:not(#reportPage){display:none!important}
+  #reportPage{display:block!important}
+  .reportPreview{border:0;padding:0}
+  table,.panel,.scorecard{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="wrap">
+    <div class="brandrow">
+      <div class="brand">
+        <h1>AI文本测评系统</h1>
+        <div class="sub">粮食安全政策效能评估体系与量化测试方案研究 · 原型系统</div>
+      </div>
+      <div class="version">V2.0</div>
+    </div>
+    <div class="tabs no-print">
+      <button class="tabbtn active" data-page="overviewPage" onclick="showPage('overviewPage',this)">综合测评</button>
+      <button class="tabbtn" data-page="detailPage" onclick="showPage('detailPage',this)">单模型详情</button>
+      <button class="tabbtn" data-page="expertPage" onclick="showPage('expertPage',this)">专家复核</button>
+      <button class="tabbtn" data-page="reportPage" onclick="showPage('reportPage',this)">评分报告</button>
+      <button class="tabbtn" data-page="methodPage" onclick="showPage('methodPage',this)">量表说明</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+<section id="overviewPage" class="page active">
+  <div class="notice">
+    <b>测评说明：</b>三个模型采用同一套规则进行“文本可观察证据”自动初评，模型名称不进入评分公式。V2.0新增文件导入、单模型详情、专家复核与报告导出。专家修正不会覆盖原始机器分，而是保留“机器初评—专家复核—最终分”的完整痕迹。
+  </div>
+
+  <div class="meta no-print">
+    <div class="field"><label>测评题目</label><input id="taskTitle" value="关于构建粮食产销区省际横向利益补偿机制的咨政报告"></div>
+    <div class="field"><label>测评编号</label><input id="testId" value="FS-AI-2026-001"></div>
+    <div class="field"><label>测评日期</label><input id="testDate" type="date"></div>
+  </div>
+
+  <div class="toolbar no-print">
+    <button class="primary" onclick="evaluateAll()">开始测评</button>
+    <button onclick="restoreExamples()">恢复三份样例</button>
+    <button onclick="clearAll()">清空文本</button>
+    <button onclick="downloadCSV()">导出CSV</button>
+    <button onclick="prepareReport();showPage('reportPage',document.querySelector('[data-page=reportPage]'))">生成评分报告</button>
+  </div>
+
+  <div class="inputArea">
+    <div class="grid3">
+      <div class="card">
+        <div class="card-h"><div class="model">Kimi</div><span class="pill">基础大模型</span></div>
+        <textarea class="textbox" id="kimiText" placeholder="粘贴或上传 Kimi 输出文本"></textarea>
+        <div class="filebar"><span>字数：<b id="kimiLen">0</b></span><input type="file" accept=".txt,.md,.html,.htm,.csv,.json" onchange="loadTextFile(event,'kimiText')"></div>
+      </div>
+      <div class="card">
+        <div class="card-h"><div class="model">DeepSeek</div><span class="pill">基础大模型</span></div>
+        <textarea class="textbox" id="deepseekText" placeholder="粘贴或上传 DeepSeek 输出文本"></textarea>
+        <div class="filebar"><span>字数：<b id="deepseekLen">0</b></span><input type="file" accept=".txt,.md,.html,.htm,.csv,.json" onchange="loadTextFile(event,'deepseekText')"></div>
+      </div>
+      <div class="card">
+        <div class="card-h"><div class="model">粮策智能体</div><span class="pill">垂类智能体</span></div>
+        <textarea class="textbox" id="grainText" placeholder="粘贴或上传 粮策智能体 输出文本"></textarea>
+        <div class="filebar"><span>字数：<b id="grainLen">0</b></span><input type="file" accept=".txt,.md,.html,.htm,.csv,.json" onchange="loadTextFile(event,'grainText')"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>一、综合测评结果</h2>
+    <div id="scorecards" class="scorecards"></div>
+  </div>
+  <div class="section dash">
+    <div class="panel"><h3>六维得分对比</h3><div id="matrix"></div></div>
+    <div class="panel"><h3>六维雷达图</h3><div class="radarWrap" id="radar"></div></div>
+  </div>
+  <div class="section">
+    <h2>二、自动评分证据</h2>
+    <div id="details" class="panel"></div>
+  </div>
+</section>
+
+<section id="detailPage" class="page">
+  <div class="detailHead">
+    <div>
+      <h2 style="margin:0;color:#173f30">单模型详情页</h2>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px">查看某一模型的机器分、专家复核分、六维得分、加扣分依据和政策安全提示。</div>
+    </div>
+    <div class="field no-print" style="min-width:210px">
+      <label>选择模型</label>
+      <select id="detailModel" onchange="renderModelDetail()">
+        <option value="grain">粮策智能体</option>
+        <option value="kimi">Kimi</option>
+        <option value="deepseek">DeepSeek</option>
+      </select>
+    </div>
+  </div>
+  <div id="modelDetail"></div>
+</section>
+
+<section id="expertPage" class="page">
+  <div class="notice"><b>专家复核机制：</b>专家可对六个维度逐项修正。未填写的维度保留机器初评分；填写后的维度以专家分作为最终分，同时记录专家姓名、单位、修正理由与时间。该设计用于形成可审计的“人机协同评分”。</div>
+  <div class="expertLayout">
+    <div class="expertForm">
+      <div class="field"><label>复核模型</label>
+        <select id="expertModel" onchange="renderExpertForm()">
+          <option value="grain">粮策智能体</option>
+          <option value="kimi">Kimi</option>
+          <option value="deepseek">DeepSeek</option>
+        </select>
+      </div>
+      <div class="field" style="margin-top:9px"><label>专家姓名</label><input id="expertName" placeholder="例如：张三"></div>
+      <div class="field" style="margin-top:9px"><label>单位 / 专业</label><input id="expertOrg" placeholder="例如：经济管理学院 / 农业经济政策"></div>
+      <div class="field" style="margin-top:9px"><label>总体复核意见</label><textarea id="expertNote" placeholder="说明主要修正依据、需要人工核验的政策点等"></textarea></div>
+      <div class="toolbar">
+        <button class="primary" onclick="saveExpertReview()">保存本次复核</button>
+        <button onclick="resetExpertReview()">重置该模型专家分</button>
+      </div>
+      <div class="finalBox" id="expertFinalBox"></div>
+    </div>
+    <div class="panel">
+      <h3>六维人工修正</h3>
+      <div id="expertScoreTable"></div>
+      <h3 style="margin-top:16px">复核记录</h3>
+      <div id="auditLog" class="audit"></div>
+    </div>
+  </div>
+</section>
+
+<section id="reportPage" class="page">
+  <div class="toolbar no-print">
+    <button class="primary" onclick="prepareReport()">刷新报告</button>
+    <button onclick="exportWord()">导出Word报告（.doc）</button>
+    <button onclick="window.print()">打印 / 导出PDF</button>
+  </div>
+  <div id="reportPreview" class="reportPreview"></div>
+</section>
+
+<section id="methodPage" class="page">
+  <h2 style="color:#173f30;margin-top:0">量表结构与测量逻辑</h2>
+  <div class="method">
+    <div class="m"><b>政策与事实准确性（20）</b>政策年份、文件、制度对象、关键概念是否准确。明显时间线错误和政策歧义触发扣分或人工复核。</div>
+    <div class="m"><b>数据与证据可核验性（20）</b>数字是否有年份，来源是否指向政府部门、政策原文、研究报告或其他可追溯依据。</div>
+    <div class="m"><b>政策理解与任务适配度（15）</b>是否真正进入横向补偿机制、主产区/主销区责任、商品量、净调出量、机会成本等专业层面。</div>
+    <div class="m"><b>分析逻辑与约束识别（15）</b>是否说明问题、条件、制度边界、财政承受、统计口径、协商成本、监管风险等。</div>
+    <div class="m"><b>建议可执行性（20）</b>是否具有责任主体、动作、实施路径、依据、适用范围、限制条件和优先级。</div>
+    <div class="m"><b>咨政规范与表达效率（10）</b>核心结论是否前置，结构是否接近报送件，是否避免长篇论文式铺陈。</div>
+    <div class="m"><b>过程能力证据（附加项）</b>识别检索、数据库、政策原文、测算、图表等痕迹。正式研究应进一步读取系统日志，不计入本版100分。</div>
+    <div class="m"><b>政策安全提示（门槛项）</b>重大政策事实错误、时间线错误或容易产生政策误读的措辞需进入人工复核，而不是被总分简单平均掉。</div>
+    <div class="m"><b>专家复核原则</b>机器分不被删除；专家可逐项覆盖，系统同时保留机器初评、专家分和修正理由，形成完整审计链。</div>
+  </div>
+</section>
+
+<div class="foot">粮食安全政策效能评估体系与量化测试方案研究 · V2.0原型系统。自动评分仅用于标准化初评与演示，正式研究结果应结合政策原文核验、专家盲评和系统调用日志。</div>
+</div>
+
+<script>
+const EXAMPLES = {"grain": "关于构建粮食产销区省际横向利益补偿机制的咨政报告 \n核心结论： 当前，建立健全粮食产销区省际横向利益补偿机制，是破解“产粮大县、财政穷县”困境、筑牢国家粮食安全根基的关键举措。该机制是对现有中央纵向补偿体系的有效补充，其核心逻辑是从“要地种粮”转向“花钱买粮”。建议在中央统筹下，以“粮食商品量”为核心基准，建立“主销区出资、主产区受益”的省际补偿基金，并同步改革现行粮食风险基金制度，将补偿资金精准用于提升主产区粮食综合生产能力和提高种粮农民积极性上。\n\n[政策依据]\n国家和地方层面已为横向补偿机制提供了明确的政策导向和法理基础。\n\n中央政策明确要求建立横向补偿机制。 2025年中央一号文件明确提出“统筹建立粮食产销区省际横向利益补偿机制”，将其作为健全粮食主产区奖补激励制度的重要一环（光明网理论频道，2025）。这标志着国家已将横向补偿上升为与纵向补偿并行的制度安排，旨在解决“谁吃粮谁拿钱”的公平性问题。\n地方实践探索提供了改革方向。 全国人大农委等机构在调研中建议，要“调整和改进粮食风险基金筹集办法”和“进一步明确粮食主销区政府促进粮食生产的责任”（本地政策证据）。这些建议为横向补偿机制的资金来源和责任划分指明了方向，即要求主销区承担起对等的粮食安全责任，可通过向主产区支付补偿金、共建生产基地等方式履行义务。\n明确的补偿参照系已初步形成。 生态保护领域的横向补偿机制已先行先试，财政部近期就健全横向生态保护补偿机制作出说明，为粮食领域的制度设计提供了可借鉴的经验（财政部，2025）。两者在“受益者补偿、保护者受益”原则、补偿标准核算、资金使用监管等方面具有共通性，可有效降低制度设计成本。\n\n[问题背景]\n“产粮大县、财政穷县”矛盾突出，单纯依靠中央纵向补偿已难以弥合产销区之间的发展差距和责任失衡。\n\n主产区发展权受限，利益流失严重。 粮食主产区承担了保障国家粮食安全的核心功能，必然需要将大量优质土地、水资源等要素投入粮食生产，客观上牺牲了发展高附加值工业和服务业的机会，形成“粮财倒挂”现象（审计署研究报告，2024）。这种发展机会成本的损失，需要通过外部补偿来弥补。\n现有纵向补偿机制存在局限性。 当前以中央财政转移支付为主的补偿模式，资金规模有限，难以全面覆盖主产区的发展需求。例如，作为主产区重要补偿工具的粮食风险基金，其筹集和使用办法仍需调整和改进（本地政策证据）。中央财政压力较大，且难以精准衡量各主产区因保障粮食安全而牺牲的具体发展成本。\n产销区责任分担不均衡。 主销区是商品粮的主要消费者，其粮食安全有赖于主产区的稳定供给，但长期以来承担的直接补偿责任较小。有研究指出，现有补偿机制存在“产销区划分不明确、补偿标准不科学”等问题（审计署研究报告，2024），导致主产区“种粮越多、贡献越大、财政越穷”的循环难以打破，严重挫伤了地方政府抓粮和农民种粮的“两个积极性”（华南师范大学学报，2025）。\n\n[约束条件]\n在设计和实施横向补偿机制时，必须正视以下客观边界和制度障碍。\n\n补偿标准核算的复杂性。 如何科学、公允地界定补偿标准是最大技术难点。若仅以“粮食生产量”为基准，可能忽略各地因土地、水资源等要素成本差异导致的“机会成本”不同。补偿标准过低则激励不足，过高则可能引发主销区抵制，需在“补偿损失”与“分享收益”之间寻求平衡（华南师范大学学报，2025）。\n地方政府间的协商成本与行政壁垒。 横向补偿涉及省际利益的重新分配，若完全依靠各省自行协商，谈判成本极高，且容易陷入“公地悲剧”困境。主销区可能缺乏主动补偿的政治意愿，或要求附带购买耕地占用指标等不对等条件，使机制难以落地。这需要中央层面强有力的统筹和协调。\n资金使用与监管的制度障碍。 补偿资金“如何用”和“如何管”是决定机制成败的关键。若资金直接补贴地方财政，可能被用于弥补其他支出缺口，未能真正惠及种粮农民和粮食生产。因此，必须建立严格的资金使用监管体系，确保补偿资金与粮食生产、农民利益直接挂钩，并防范资金挪用风险。\n\n[政策建议]\n基于以上分析，建议分步实施、重点突破，构建“中央统筹、省际协同、精准补偿”的横向利益补偿机制。\n\n（优先实施）改革粮食风险基金，建立中央统筹的省际补偿基金。\n建议内容：将现行粮食风险基金的筹集方式，由“中央-地方”分担，改革为“中央-主产区-主销区”三方共担。主销区根据其粮食调入量或消费量，向中央财政统一缴纳横向补偿资金，汇入专项基金。中央财政进行适度配比，并负责统一管理、统一拨付给净调出主产区。\n依据：本地政策已明确建议“调整和改进粮食风险基金筹集办法”，并明确主销区政府责任（本地政策证据）。这为在现有基金框架内嵌入横向补偿功能提供了最直接、改革成本最低的路径。\n适用范围：全国13个粮食主产区和北京、上海、广东等7个主销区。\n\n（核心措施）确立以“粮食商品量”为主的补偿基准，辅以“机会成本”修正。\n建议内容：将补偿资金分配依据从“计税面积”改为“粮食商品量”（本地政策证据）。商品量数据可从国家统计局、国家粮食和物资储备局调取。同时，可委托第三方机构，根据不同主产区的发展阶段和资源禀赋，测算一个“机会成本损失系数”，对补偿金额进行加权修正，使补偿更趋公平。\n依据：本地政策证据明确要求将补贴依据改为按粮食产量、商品量给予补贴。这直接回应了“谁种粮多、谁调出多、谁受益多”的原则，激励效果最精准。\n限制条件：机会成本系数的测算方法需经各方认可，初期可暂不引入，待机制成熟后再行优化。\n\n（资金定向）划定补偿资金使用“负面清单”与“正面导向”。\n建议内容：明确规定补偿资金主要用于两大方向：一是直接用于提高种粮农民补贴和农业社会化服务；二是用于小型农田水利、仓储物流、耕地质量保护等粮食生产基础设施建设。\n依据：本地政策指出，要继续对种粮农民进行直补，并同时提高补贴标准，以及加大对农田水利设施的投入。\n适用范围：所有获得补偿资金的主产县，要求建立专户管理，接受审计监督。\n\n（远期探索）鼓励多元化、契约化的产销区协作模式。\n建议内容：在省际补偿基金之外，鼓励主销区与主产区通过签订长期购销协议、异地共建粮食生产基地、投资参股主产区粮食加工企业等方式，形成更紧密的利益联结。国家可对这类合作项目给予信贷、用地等政策支持。\n依据：全国人大农委建议探索建立多元化的粮食合作关系（本地政策证据）。\n限制条件：此模式依赖双方自愿，是基金的补充而非替代，不可强行摊派。", "deepseek": "关于建立粮食产销区横向利益补偿机制的咨政报告\n\n一、问题背景与战略意义\n粮食安全是“国之大者”，是治国理政的头等大事。当前，我国粮食生产区域集中化趋势日益明显，13个主产省（区）粮食产量占全国总产量的78%以上，而7个主销区省（市）粮食自给率持续下降，产销区之间“吃粮靠调运、发展靠转移”的结构性矛盾日益突出。\n2024年中央一号文件首次提出“探索建立粮食产销区省际横向利益补偿机制”，党的二十届三中全会进一步明确“统筹建立粮食产销区省际横向利益补偿机制，在主产区利益补偿上迈出实质步伐”。\n\n二、国内现有实践基础与现实条件\n长期以来，我国主要通过中央财政对产粮大县实施奖励、最低收购价政策、农业补贴等渠道对主产区进行利益补偿。目前，中央财政每年安排产粮大县奖励资金约500亿元，农业支持保护补贴、农机购置补贴等各类惠农补贴资金规模超过2000亿元。\n部分地区已开展小范围横向补偿尝试。例如，北京市与河北省部分产粮县建立对口协作关系，广东省与黑龙江等省份探索粮食产销合作新模式，浙江省与粮食主产区签订长期购销合同并给予一定返利等。\n\n三、存在的主要问题与制约因素\n补偿标准缺乏科学统一的核算依据；补偿主体与受益主体界定不清；补偿方式单一，造血功能不足；缺乏强有力的组织协调和考核约束机制；可能引发新的扭曲和矛盾。\n\n四、国际经验借鉴与启示\n日本、欧盟、美国在农业补贴、农业保险、农村发展等方面均形成了较成熟的支持体系。横向补偿应作为纵向支持的补充而非替代，补偿标准应科学量化，补偿方式应多元化，并建立跨区域、跨部门的统筹协调机制。\n\n五、总体思路与框架设计\n以习近平新时代中国特色社会主义思想为指导，坚持“谁受益、谁补偿，谁保护、谁受偿”的原则，构建“中央统筹、省际协作、多元补偿、动态调整”的粮食产销区横向利益补偿机制。\n建议采用“综合贡献度法”：①粮食净调出量（权重40%）；②粮食种植面积占比（权重25%）；③耕地资源消耗指数（权重15%）；④财政收入损失系数（权重20%）。初期可设定补偿标准区间为每调出一斤粮食补偿0.1—0.3元。\n建立“粮食产销区横向补偿基金”，由中央财政统一归集、统一拨付。销区省级政府按年度向基金缴纳补偿资金。\n鼓励资金补偿、产业合作、对口协作、指标交易等多元方式。\n\n六、政策建议\n第一阶段（2026—2027年）选择3—5对产销省份开展试点；第二阶段（2028—2030年）全面推开；第三阶段（2031年以后）完善提升。\n防止补偿依赖、防止新的不公、防止激励扭曲、防止区域矛盾激化。\n建立高层协调机制，完善法律法规体系，健全考核评价体系，强化数据支撑和信息化建设，建立动态调整和评估机制。", "kimi": "关于统筹建立粮食产销区省际横向利益补偿机制的咨政报告\n\n【要报】粮食产销区省际横向利益补偿机制是健全主产区利益补偿制度的关键举措。当前，13个粮食主产区产量占全国77.9%以上，但长期面临“粮财倒挂”“高产穷县”困境，黑龙江、河南两省2023年人均地方财政收入不足全国平均水平的55%。仅靠中央财政纵向转移支付难以从根本上破解这一结构性矛盾。2025年中央一号文件已明确提出“启动实施中央统筹下的粮食产销区省际横向利益补偿”，建议尽快出台实施办法，构建“纵横结合”的利益补偿格局。\n\n一、建立机制的重大意义\n2004年以来，13个粮食主产区粮食产量占全国比重由72.67%提高到77.90%，粮食增量的88.77%由主产区贡献；而主销区粮食产量比重由7.35%下降至4.30%，粮食播种面积减少2693万亩，2023年常住人口人均粮食产量比全国低396公斤。\n2023年，黑龙江和河南地方人均财政收入分别为4559元和4597元，全国为8315元。\n\n二、当前推进机制面临的主要难点\n粮食流通数据“统计难”，补偿基数缺乏精准依据；补偿标准“核算难”，各方利益平衡难度大；补偿方式“落地难”，制度协同与可持续性面临挑战；产销区划分“适配难”，现有分类与实际情况存在偏差。\n有学者基于机会成本法测算，2022年全国横向补偿受偿总额约为1664—1819亿元，其中黑龙江、内蒙古和吉林的受偿金额约占受偿总额的90%。\n\n三、对策建议\n（一）尽快出台国家层面实施办法，明确制度框架。由中央财办、财政部、农业农村部、国家发展改革委等部门牵头，制定实施办法。\n（二）优化产销区划分。依据近5年粮食自给率、净调（入）出量、常住人口人均粮食产量等指标，对全国31个省（区、市）重新分类，可将粮食自给率持续低于50%的省份明确为主销区，高于120%且常年净调出的省份明确为主产区。\n（三）建立补偿资金池。设立由中央代管的“粮食产销区横向补偿基金”。\n（四）科学核定补偿标准。以各省粮食净调入（出）量为基础，综合考虑粮食生产成本、资源消耗、生态服务价值、发展机会成本等因素。\n（五）创新补偿实现方式，推动“输血”与“造血”相结合。可设置内生性补偿基金、外生性补偿基金、产业链建设基金、粮食储备与供应链建设基金、产销市场建设基金。\n（六）建立粮食流通数据共享平台，由国家统计局、国家粮食和物资储备局牵头完善统计制度。\n（七）建立绩效考核与动态调整机制，将横向利益补偿落实情况纳入粮食安全党政同责考核体系。\n（八）鼓励先行先试，选择广东—黑龙江、浙江—河南、福建—吉林等省份对开展试点。\n\n结语\n从2023年“探索建立”到2025年“启动实施”，再到2026年“落实好”，政策信号明确、推进节奏加快。"};
+const dims = [
+  {key:'accuracy',name:'政策与事实准确性',max:20},
+  {key:'evidence',name:'数据与证据可核验性',max:20},
+  {key:'fit',name:'政策理解与任务适配度',max:15},
+  {key:'logic',name:'分析逻辑与约束识别',max:15},
+  {key:'action',name:'建议可执行性',max:20},
+  {key:'format',name:'咨政规范与表达效率',max:10}
+];
+const MODELS = [
+  {id:'kimi',name:'Kimi',type:'基础大模型'},
+  {id:'deepseek',name:'DeepSeek',type:'基础大模型'},
+  {id:'grain',name:'粮策智能体',type:'垂类智能体'}
+];
+let RESULTS = {};
+let REVIEWS = {kimi:{scores:{},history:[]},deepseek:{scores:{},history:[]},grain:{scores:{},history:[]}};
+
+function countMatches(text, arr){
+  let c=0,hits=[];
+  arr.forEach(k=>{const m=text.match(new RegExp(k,'g'));if(m){c+=m.length;hits.push(k.replace(/\\b/g,''));}});
+  return {count:c,hits:[...new Set(hits)]};
+}
+function clamp(x,min,max){return Math.max(min,Math.min(max,x))}
+function cleanLen(t){return (t||'').replace(/\s/g,'').length}
+function addReason(list,label,value,positive=true){if(value>0)list.push({label,value,positive})}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function nowCN(){return new Date().toLocaleString('zh-CN',{hour12:false})}
+
+function scoreText(text){
+  text=text||''; const L=cleanLen(text);
+  const out={reasons:{},flags:[],process:0};
+  let s=0,r=[];
+
+  const rel=countMatches(text,['粮食产销区','横向利益补偿','主产区','主销区','中央统筹','粮食安全']);
+  if(rel.count>=4){s+=8;addReason(r,'主题与制度对象识别充分',8)}
+  else if(rel.count>=2){s+=5;addReason(r,'主题与制度对象基本识别',5)}
+  if(/2024年[^。；\n]{0,50}探索建立/.test(text)){s+=3;addReason(r,'识别“2024—探索建立”政策节点',3)}
+  if(/2025年[^。；\n]{0,60}(启动实施|统筹建立)/.test(text)){s+=3;addReason(r,'识别“2025—启动实施/统筹建立”政策节点',3)}
+  if(/2026年[^。；\n]{0,60}落实好/.test(text)){s+=2;addReason(r,'识别“2026—落实好”政策节点',2)}
+  const entities=countMatches(text,['中央一号文件','二十届三中全会','国家统计局','财政部','农业农村部','国家粮食和物资储备局','全国人大农委','粮食风险基金']);
+  let eb=Math.min(4,entities.hits.length*.7);s+=eb;addReason(r,'权威政策/机构实体匹配',eb);
+  if(/2023年[^。；\n]{0,50}探索建立/.test(text)){s-=4;addReason(r,'“2023—探索建立”时间线需核验',4,false);out.flags.push('出现“2023年—探索建立”表述，建议对照中央一号文件核验。')}
+  if(/花钱买粮/.test(text)){s-=1;addReason(r,'“花钱买粮”表述可能产生政策歧义',1,false);out.flags.push('“花钱买粮”可读性强，但可能被理解为主销区以缴费替代粮食责任，建议人工复核表述。')}
+  out.accuracy=clamp(s,0,20);out.reasons.accuracy=r;
+
+  s=0;r=[];
+  const nums=(text.match(/\d+(?:\.\d+)?%?|\d{4}年/g)||[]).length;
+  let nb=Math.min(5,nums/8);s+=nb;addReason(r,'存在可核查的年份/数字信息',nb);
+  const sourceTerms=countMatches(text,['国家统计局','国家粮食和物资储备局','财政部','农业农村部','审计署','中央一号文件','学报','研究报告','政策证据','来源','依据','光明网','经济日报','全国人大农委']);
+  let sb=Math.min(9,sourceTerms.hits.length);s+=sb;addReason(r,'出现来源/依据/权威部门标识',sb);
+  const parenthetical=(text.match(/[（(][^）)]{2,25}(?:20\d{2}|政策证据|来源)[^）)]*[）)]/g)||[]).length;
+  let pb=Math.min(4,parenthetical*.7);s+=pb;addReason(r,'出现括注式证据标识',pb);
+  if(/政策依据|参考依据|数据来源/.test(text)){s+=2;addReason(r,'设置专门证据/来源结构',2)}
+  if(nums>15&&sourceTerms.hits.length<2){s-=3;addReason(r,'数字密集但可追溯来源不足',3,false)}
+  if(/本地政策证据/.test(text)){s-=.8;addReason(r,'“本地政策证据”仍需落到具体文件',.8,false)}
+  out.evidence=clamp(s,0,20);out.reasons.evidence=r;
+
+  s=0;r=[];
+  const core=countMatches(text,['横向利益补偿','中央统筹','纵向补偿','纵横结合','粮食商品量','净调出量','粮食风险基金','机会成本','补偿基金','主销区','主产区','产粮大县','粮财倒挂']);
+  s=Math.min(12,core.hits.length*1.15);addReason(r,'覆盖核心政策机制与专业概念',s);
+  if(/补偿(标准|基准|口径|资金|主体|对象)/.test(text)){s+=2;addReason(r,'进入补偿机制设计层面',2)}
+  if(/粮食安全/.test(text)){s+=1;addReason(r,'与粮食安全治理目标对齐',1)}
+  out.fit=clamp(s,0,15);out.reasons.fit=r;
+
+  s=0;r=[];
+  const constraints=countMatches(text,['问题','难点','约束','限制条件','风险','财政压力','财政承受','协商成本','统计难','核算难','监管','挪用','动态调整','行政壁垒','机会成本','边界','口径']);
+  let cb=Math.min(10,constraints.hits.length*.9);s+=cb;addReason(r,'识别制度约束、风险与边界',cb);
+  const logicWords=countMatches(text,['因此','从而','如果','若','导致','由于','同时','但','而非','需要','避免','防止']);
+  let lb=Math.min(3,logicWords.hits.length*.45);s+=lb;addReason(r,'存在因果/条件逻辑表达',lb);
+  if(/问题背景|存在的主要问题|面临的主要难点/.test(text)){s+=1;addReason(r,'问题诊断结构清晰',1)}
+  if(/约束条件|限制条件/.test(text)){s+=1.5;addReason(r,'显式呈现约束/限制条件',1.5)}
+  out.logic=clamp(s,0,15);out.reasons.logic=r;
+
+  s=0;r=[];
+  const actionWords=countMatches(text,['建议','建立','改革','明确','设立','调整','划定','纳入','统筹','委托','实行','拨付','监管','试点','制定','出台','调取','配比','共建','签订']);
+  let ab=Math.min(7,actionWords.hits.length*.45);s+=ab;addReason(r,'包含明确政策动作',ab);
+  const actors=countMatches(text,['中央','财政部','农业农村部','国家发展改革委','国家统计局','国家粮食和物资储备局','主销区','主产区','省级政府','第三方机构']);
+  let ac=Math.min(4,actors.hits.length*.55);s+=ac;addReason(r,'政策责任主体较明确',ac);
+  const structure=countMatches(text,['优先实施','核心措施','远期探索','资金定向','建议内容','适用范围','限制条件','依据']);
+  let st=Math.min(6,structure.hits.length*.85);s+=st;addReason(r,'建议包含优先级/依据/适用范围/限制条件',st);
+  if(/第一阶段|第二阶段|第三阶段/.test(text)){s+=2;addReason(r,'给出实施阶段',2)}
+  const vague=(text.match(/建议(加强|完善|推进|加大|强化)(?![^。；\n]{0,25}(机制|平台|基金|监管|投入|考核|建设|标准))/g)||[]).length;
+  if(vague>2){s-=1.5;addReason(r,'存在较多泛化建议表达',1.5,false)}
+  out.action=clamp(s,0,20);out.reasons.action=r;
+
+  s=0;r=[];
+  if(/核心结论|【要报】|摘要|要点/.test(text)){s+=3;addReason(r,'开篇有核心结论/要报',3)}
+  if(/政策依据/.test(text)){s+=1.2;addReason(r,'设置政策依据模块',1.2)}
+  if(/问题背景|主要问题|主要难点/.test(text)){s+=1.4;addReason(r,'设置问题诊断模块',1.4)}
+  if(/政策建议|对策建议/.test(text)){s+=1.4;addReason(r,'设置政策建议模块',1.4)}
+  if(/约束条件|限制条件/.test(text)){s+=1;addReason(r,'结构中呈现约束条件',1)}
+  const headings=(text.match(/(^|\n)[一二三四五六七八九十]+[、.．]|(^|\n)\[[^\]]+\]|(^|\n)【[^】]+】|(^|\n)（[^）]{2,12}）/g)||[]).length;
+  let hb=Math.min(1.5,headings*.18);s+=hb;addReason(r,'层级标题清晰',hb);
+  if(L>=900&&L<=4500){s+=1;addReason(r,'篇幅适合咨政初稿阅读',1)}
+  if(L>6500){s-=2;addReason(r,'篇幅偏长，决策信息密度下降',2,false)}
+  if(/国际经验/.test(text)&&L>4000){s-=.8;addReason(r,'国际经验篇幅可能挤占核心决策信息',.8,false)}
+  out.format=clamp(s,0,10);out.reasons.format=r;
+
+  let p=0;
+  if(/国家统计局|国家粮食和物资储备局|财政部|农业农村部/.test(text))p+=25;
+  if(/来源|依据|政策证据|研究报告|学报/.test(text))p+=25;
+  if(/数据库|调取|检索|政策原文|引用/.test(text))p+=20;
+  if(/图|趋势图|雷达图|柱状图|可视化/.test(text))p+=15;
+  if(/测算|系数|加权|统计/.test(text))p+=15;
+  out.process=clamp(p,0,100);
+  out.total=Math.round(dims.reduce((a,d)=>a+out[d.key],0)*10)/10;
+  out.length=L;
+  return out;
+}
+
+function grade(x){
+  if(x>=90)return '优秀：具备高质量咨政初稿基础';
+  if(x>=80)return '良好：具备较强决策支持价值';
+  if(x>=70)return '中等：结构完整但仍需校核';
+  return '需改进：证据链与可执行性不足';
+}
+function finalDim(modelId,key){
+  const r=REVIEWS[modelId]?.scores?.[key];
+  return (r!==undefined&&r!==null&&r!=='')?Number(r):RESULTS[modelId].score[key];
+}
+function finalTotal(modelId){return Math.round(dims.reduce((a,d)=>a+finalDim(modelId,d.key),0)*10)/10}
+function hasExpert(modelId){return Object.keys(REVIEWS[modelId]?.scores||{}).length>0}
+
+function evaluateAll(){
+  RESULTS={};
+  MODELS.forEach(m=>{
+    const text=document.getElementById(m.id+'Text').value;
+    RESULTS[m.id]={...m,text,score:scoreText(text)};
+  });
+  renderOverview();renderModelDetail();renderExpertForm();prepareReport();
+}
+
+function renderOverview(){
+  const arr=MODELS.map(m=>RESULTS[m.id]).filter(Boolean);
+  if(!arr.length)return;
+  const finals=arr.map(x=>finalTotal(x.id));
+  const best=Math.max(...finals);
+  document.getElementById('scorecards').innerHTML=arr.map(x=>{
+    const ft=finalTotal(x.id), expert=hasExpert(x.id);
+    return `<div class="scorecard ${ft===best?'winner':''}">
+      ${ft===best?'<div class="tag">本轮最高</div>':''}
+      <div class="model">${x.name}</div>
+      <div class="bigscore">${ft.toFixed(1)}<small> / 100</small></div>
+      <div class="autoline">${expert?`专家复核后得分；机器初评 ${x.score.total.toFixed(1)} 分`:`机器自动初评分`}</div>
+      <div class="bar"><i style="width:${ft}%"></i></div>
+      <div class="autoline">过程能力证据：${x.score.process}/100（附加项） · 安全提示：${x.score.flags.length}项</div>
+    </div>`;
+  }).join('');
+
+  let rows=dims.map(d=>{
+    const vals=arr.map(x=>finalDim(x.id,d.key)),mx=Math.max(...vals);
+    return `<tr><td>${d.name}<br><span style="color:#7b877f">满分 ${d.max}</span></td>`+
+      arr.map(x=>{
+        const v=finalDim(x.id,d.key),manual=(REVIEWS[x.id].scores[d.key]!==undefined);
+        return `<td class="num ${v===mx?'best':''}">${v.toFixed(1)}${manual?'*':''}</td>`;
+      }).join('')+`</tr>`;
+  }).join('');
+  document.getElementById('matrix').innerHTML=`<table><thead><tr><th>维度</th>${arr.map(x=>`<th>${x.name}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table><div class="autoline">* 表示该维度已由专家复核修正。</div>`;
+  renderRadar(arr,'radar',true);
+
+  document.getElementById('details').innerHTML=arr.map(x=>{
+    let body=dims.map(d=>{
+      const rs=x.score.reasons[d.key]||[];
+      return `<div style="padding:9px 0;border-top:1px solid var(--line)">
+        <div style="font-weight:700;color:#315241">${d.name}：机器 ${x.score[d.key].toFixed(1)} / ${d.max}${REVIEWS[x.id].scores[d.key]!==undefined?`；专家 ${Number(REVIEWS[x.id].scores[d.key]).toFixed(1)}`:''}</div>
+        <div class="reason">${rs.map(a=>`<span class="evidence ${a.positive?'':'deduct'}">${a.positive?'+':'−'}${a.value.toFixed(1)} ${a.label}</span>`).join('')||'未识别到显著证据。'}</div>
+      </div>`;
+    }).join('');
+    const flags=x.score.flags.length?`<div class="reason warn" style="margin-top:8px"><b>人工复核提示：</b>${x.score.flags.map(f=>' '+esc(f)).join('；')}</div>`:'';
+    return `<div style="margin-bottom:14px"><h3 style="margin:0;color:#234a37">${x.name}</h3>${body}${flags}</div>`;
+  }).join('');
+}
+
+function renderRadar(arr,targetId,useFinal=false){
+  const W=650,H=470,cx=325,cy=180,R=116,n=dims.length;
+  const angles=dims.map((_,i)=>-Math.PI/2+i*2*Math.PI/n);
+  const pt=(radius,i)=>[cx+radius*Math.cos(angles[i]),cy+radius*Math.sin(angles[i])];
+  const labels={
+    '政策与事实准确性':['政策与事实','准确性'],
+    '数据与证据可核验性':['数据与证据','可核验性'],
+    '政策理解与任务适配度':['政策理解与','任务适配度'],
+    '分析逻辑与约束识别':['分析逻辑与','约束识别'],
+    '建议可执行性':['建议可执行性'],
+    '咨政规范与表达效率':['咨政规范与','表达效率']
+  };
+  let svg=`<svg viewBox="0 0 ${W} ${H}" aria-label="六维雷达图">`;
+  [0.2,.4,.6,.8,1].forEach(k=>svg+=`<polygon points="${angles.map((_,i)=>pt(R*k,i).join(',')).join(' ')}" fill="none" stroke="#dbe2dd"/>`);
+  dims.forEach((d,i)=>{
+    const p=pt(R,i),base=pt(R+54,i),angle=angles[i];let x=base[0],y=base[1],anchor='middle';
+    if(Math.cos(angle)>.35){anchor='start';x+=8}else if(Math.cos(angle)<-.35){anchor='end';x-=8}
+    if(Math.sin(angle)>.35)y+=10;else if(Math.sin(angle)<-.75)y-=4;
+    svg+=`<line x1="${cx}" y1="${cy}" x2="${p[0]}" y2="${p[1]}" stroke="#dbe2dd"/>`;
+    const ls=labels[d.name]||[d.name],sy=y-(ls.length-1)*8;
+    svg+=`<text x="${x}" y="${sy}" text-anchor="${anchor}" font-size="12.5" fill="#55645b">${ls.map((line,j)=>`<tspan x="${x}" dy="${j===0?0:16}">${line}</tspan>`).join('')}</text>`;
+  });
+  const styles=[
+    {stroke:'#6a7680',fill:'rgba(106,118,128,.07)'},
+    {stroke:'#8a6b3c',fill:'rgba(138,107,60,.06)'},
+    {stroke:'#1f5d43',fill:'rgba(31,93,67,.10)'}
+  ];
+  arr.forEach((x,idx)=>{
+    const points=dims.map((d,i)=>pt(R*((useFinal?finalDim(x.id,d.key):x.score[d.key])/d.max),i).join(',')).join(' ');
+    svg+=`<polygon points="${points}" fill="${styles[idx%3].fill}" stroke="${styles[idx%3].stroke}" stroke-width="2.3"/>`;
+  });
+  const ly=423;
+  arr.forEach((x,idx)=>{
+    const lx=55+idx*185;
+    svg+=`<rect x="${lx}" y="${ly}" width="18" height="4" fill="${styles[idx%3].stroke}"/><text x="${lx+27}" y="${ly+4}" font-size="13" fill="#44524a" dominant-baseline="middle">${x.name}</text>`;
+  });
+  svg+='</svg>';document.getElementById(targetId).innerHTML=svg;
+}
+
+function renderModelDetail(){
+  if(!Object.keys(RESULTS).length)return;
+  const id=document.getElementById('detailModel').value,x=RESULTS[id];
+  if(!x)return;
+  const final=finalTotal(id),expert=hasExpert(id);
+  const dimRows=dims.map(d=>{
+    const auto=x.score[d.key],fv=finalDim(id,d.key),rs=x.score.reasons[d.key]||[];
+    return `<div class="dimrow">
+      <div class="dimtitle"><span>${d.name}</span><span>${fv.toFixed(1)} / ${d.max}${REVIEWS[id].scores[d.key]!==undefined?'（专家）':''}</span></div>
+      <div class="miniBar"><i style="width:${fv/d.max*100}%"></i></div>
+      <div class="reason">机器初评 ${auto.toFixed(1)}。${rs.map(a=>`<span class="evidence ${a.positive?'':'deduct'}">${a.positive?'+':'−'}${a.value.toFixed(1)} ${a.label}</span>`).join('')}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('modelDetail').innerHTML=`
+    <div class="detailGrid">
+      <div>
+        <div class="kpis">
+          <div class="kpi"><b>${final.toFixed(1)}</b><span>${expert?'专家复核后总分':'机器自动总分'}</span></div>
+          <div class="kpi"><b>${x.score.process}</b><span>过程能力证据 / 100（附加项）</span></div>
+          <div class="kpi"><b>${x.score.length}</b><span>有效文本字数</span></div>
+          <div class="kpi"><b>${x.score.flags.length}</b><span>政策安全/人工复核提示</span></div>
+        </div>
+        <div class="panel">
+          <h3>${x.name}六维能力图</h3>
+          <div class="radarWrap" id="singleRadar"></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>${x.name}逐维评分证据</h3>
+        <div class="dimlist">${dimRows}</div>
+        ${x.score.flags.length?`<div class="notice" style="margin-top:10px;border-left-color:var(--warn)"><b>人工复核提示：</b><br>${x.score.flags.map(f=>'• '+esc(f)).join('<br>')}</div>`:''}
+      </div>
+    </div>`;
+  renderRadar([x],'singleRadar',true);
+}
+
+function renderExpertForm(){
+  if(!Object.keys(RESULTS).length)return;
+  const id=document.getElementById('expertModel').value,x=RESULTS[id];
+  const rev=REVIEWS[id];
+  const rows=dims.map(d=>{
+    const stored=rev.scores[d.key];
+    return `<tr>
+      <td>${d.name}<br><span style="color:#7c8881">满分${d.max}</span></td>
+      <td class="num">${x.score[d.key].toFixed(1)}</td>
+      <td class="num"><input type="number" id="expert_${d.key}" min="0" max="${d.max}" step="0.1" value="${stored!==undefined?stored:''}" placeholder="不改"></td>
+      <td><input type="text" id="reason_${d.key}" value="${esc(rev.reasons?.[d.key]||'')}" placeholder="如修正，请写明依据"></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('expertScoreTable').innerHTML=`<table class="expertTable"><thead><tr><th>维度</th><th>机器分</th><th>专家分</th><th>修正理由</th></tr></thead><tbody>${rows}</tbody></table>`;
+  updateExpertBox(id);
+  renderAudit(id);
+}
+function updateExpertBox(id){
+  const x=RESULTS[id],ft=finalTotal(id);
+  document.getElementById('expertFinalBox').innerHTML=`<div style="font-size:11.5px;color:var(--muted)">机器初评：${x.score.total.toFixed(1)} 分</div><div style="margin-top:5px">当前最终分：<b>${ft.toFixed(1)}</b> / 100</div><div style="font-size:11.5px;color:var(--muted);margin-top:4px">${hasExpert(id)?'已存在专家修正；未修正维度继续采用机器分。':'尚未进行专家修正。'}</div>`;
+}
+function saveExpertReview(){
+  if(!Object.keys(RESULTS).length)return;
+  const id=document.getElementById('expertModel').value,rev=REVIEWS[id],before=finalTotal(id);
+  const newScores={},newReasons={};let changed=[];
+  dims.forEach(d=>{
+    const el=document.getElementById('expert_'+d.key),raw=el.value.trim();
+    if(raw!==''){
+      let v=clamp(Number(raw),0,d.max);newScores[d.key]=v;
+      newReasons[d.key]=document.getElementById('reason_'+d.key).value.trim();
+      changed.push(`${d.name}:${RESULTS[id].score[d.key].toFixed(1)}→${v.toFixed(1)}`);
+    }
+  });
+  rev.scores=newScores;rev.reasons=newReasons;
+  rev.expert=document.getElementById('expertName').value.trim()||'未署名专家';
+  rev.org=document.getElementById('expertOrg').value.trim();
+  rev.note=document.getElementById('expertNote').value.trim();
+  rev.history.push({time:nowCN(),expert:rev.expert,org:rev.org,note:rev.note,changes:changed});
+  renderExpertForm();renderOverview();renderModelDetail();prepareReport();
+  alert(`已保存 ${RESULTS[id].name} 的专家复核。当前最终分：${finalTotal(id).toFixed(1)} 分`);
+}
+function resetExpertReview(){
+  const id=document.getElementById('expertModel').value;
+  REVIEWS[id]={scores:{},history:REVIEWS[id].history||[],reasons:{},expert:'',org:'',note:''};
+  REVIEWS[id].history.push({time:nowCN(),expert:'系统',org:'',note:'重置专家修正，恢复机器初评分。',changes:[]});
+  renderExpertForm();renderOverview();renderModelDetail();prepareReport();
+}
+function renderAudit(id){
+  const h=REVIEWS[id].history||[];
+  document.getElementById('auditLog').innerHTML=h.length?h.slice().reverse().map(a=>`<div class="item"><b>${esc(a.time)} · ${esc(a.expert)}</b>${a.org?' · '+esc(a.org):''}<br>${a.changes?.length?esc(a.changes.join('；')):'无逐项改分'}${a.note?'<br>说明：'+esc(a.note):''}</div>`).join(''):'暂无专家复核记录。';
+}
+
+function loadTextFile(event,targetId){
+  const file=event.target.files[0];if(!file)return;
+  const allowed=/\.(txt|md|html?|csv|json)$/i;
+  if(!allowed.test(file.name)){alert('当前离线版支持 TXT、MD、HTML、CSV、JSON 文本文件。Word文档请另存为TXT后导入。');event.target.value='';return;}
+  const reader=new FileReader();
+  reader.onload=e=>{
+    let content=String(e.target.result||'');
+    if(/\.html?$/i.test(file.name)){
+      const tmp=document.createElement('div');tmp.innerHTML=content;content=tmp.innerText||tmp.textContent||'';
+    }
+    document.getElementById(targetId).value=content;updateLens();
+    const modelId=targetId.replace('Text','');RESULTS[modelId]={...MODELS.find(m=>m.id===modelId),text:content,score:scoreText(content)};
+    if(Object.keys(RESULTS).length===3){renderOverview();renderModelDetail();renderExpertForm();prepareReport();}
+  };
+  reader.readAsText(file,'utf-8');
+}
+
+function prepareReport(){
+  if(!Object.keys(RESULTS).length)evaluateAll();
+  const task=esc(document.getElementById('taskTitle').value);
+  const testId=esc(document.getElementById('testId').value);
+  const date=esc(document.getElementById('testDate').value||new Date().toISOString().slice(0,10));
+  const arr=MODELS.map(m=>RESULTS[m.id]).filter(Boolean);
+  const sorted=arr.slice().sort((a,b)=>finalTotal(b.id)-finalTotal(a.id));
+  const scoreRows=arr.map(x=>`<tr><td>${x.name}</td><td class="num">${x.score.total.toFixed(1)}</td><td class="num">${hasExpert(x.id)?finalTotal(x.id).toFixed(1):'—'}</td><td>${grade(finalTotal(x.id))}</td></tr>`).join('');
+  const dimRows=dims.map(d=>`<tr><td>${d.name}</td>${arr.map(x=>`<td class="num">${finalDim(x.id,d.key).toFixed(1)}</td>`).join('')}</tr>`).join('');
+  const reviewText=arr.map(x=>{
+    const r=REVIEWS[x.id];
+    if(!hasExpert(x.id)&&!(r.note||''))return '';
+    return `<p><b>${x.name}：</b>${r.expert?`复核专家 ${esc(r.expert)}${r.org?'（'+esc(r.org)+'）':''}。`:''}${r.note?esc(r.note):'已进行逐项复核。'}</p>`;
+  }).join('');
+  const flags=arr.map(x=>x.score.flags.length?`<p><b>${x.name}：</b>${x.score.flags.map(esc).join('；')}</p>`:'').join('');
+  document.getElementById('reportPreview').innerHTML=`
+    <div class="reportTitle"><h2>粮食安全智能体文本测评报告</h2><p>测评编号：${testId}　测评日期：${date}</p></div>
+    <h3>一、测评任务</h3><p>${task}</p>
+    <h3>二、评价方法</h3><p>采用六个一级指标进行100分制自动初评，并保留专家人工复核接口。六维分别为政策与事实准确性、数据与证据可核验性、政策理解与任务适配度、分析逻辑与约束识别、建议可执行性、咨政规范与表达效率。专家修正只覆盖对应维度，机器原始分保留用于追溯。</p>
+    <h3>三、综合结果</h3>
+    <table><thead><tr><th>模型</th><th>机器初评</th><th>复核后得分</th><th>评价</th></tr></thead><tbody>${scoreRows}</tbody></table>
+    <p style="margin-top:8px"><b>本轮排序：</b>${sorted.map((x,i)=>`${i+1}. ${x.name}（${finalTotal(x.id).toFixed(1)}分）`).join('；')}</p>
+    <h3>四、六维得分</h3>
+    <table><thead><tr><th>评价维度</th>${arr.map(x=>`<th>${x.name}</th>`).join('')}</tr></thead><tbody>${dimRows}</tbody></table>
+    <h3>五、专家复核说明</h3>${reviewText||'<p>当前未录入专家修正，结果为机器自动初评。</p>'}
+    <h3>六、政策安全与人工核验提示</h3>${flags||'<p>本轮未触发自动政策安全提示；仍建议对关键政策文件和数字进行人工核验。</p>'}
+    <h3>七、结果说明</h3><p>自动评分依据文本中可观察的政策、证据、结构、约束和行动要素产生，用于标准化初评和模型横向比较。正式研究结论还应结合政策原文核验、2名以上专家独立评分以及智能体检索/工具调用日志。</p>`;
+}
+function reportDocumentHTML(){
+  prepareReport();
+  const content=document.getElementById('reportPreview').innerHTML;
+  return `<!doctype html><html><head><meta charset="utf-8"><style>
+    body{font-family:"Microsoft YaHei","宋体",sans-serif;font-size:12pt;line-height:1.65;color:#222;margin:34px}
+    h2{text-align:center;font-size:20pt;color:#173f30} h3{font-size:14pt;margin-top:18px;color:#173f30}
+    table{width:100%;border-collapse:collapse;margin:8px 0 12px} th,td{border:1px solid #999;padding:7px} th{background:#eef4f0}.num{text-align:center}
+    p{margin:6px 0}
+  </style></head><body>${content}</body></html>`;
+}
+function exportWord(){
+  const blob=new Blob(['\ufeff',reportDocumentHTML()],{type:'application/msword'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=`粮食安全智能体测评报告_${document.getElementById('testId').value||'V2'}.doc`;
+  a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+function downloadCSV(){
+  if(!Object.keys(RESULTS).length)evaluateAll();
+  let csv='\uFEFF模型,机器初评,最终得分,'+dims.map(d=>d.name).join(',')+',过程能力证据,安全提示数\n';
+  MODELS.forEach(m=>{const x=RESULTS[m.id];csv += [x.name,x.score.total,finalTotal(m.id),...dims.map(d=>finalDim(m.id,d.key)),x.score.process,x.score.flags.length].join(',')+'\n'});
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}),a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download='粮食安全智能体测评结果_V2.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+
+function showPage(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.tabbtn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  if(id==='detailPage')renderModelDetail();
+  if(id==='expertPage')renderExpertForm();
+  if(id==='reportPage')prepareReport();
+}
+function restoreExamples(){
+  document.getElementById('kimiText').value=EXAMPLES.kimi;
+  document.getElementById('deepseekText').value=EXAMPLES.deepseek;
+  document.getElementById('grainText').value=EXAMPLES.grain;
+  updateLens();evaluateAll();
+}
+function clearAll(){
+  MODELS.forEach(m=>document.getElementById(m.id+'Text').value='');
+  RESULTS={};REVIEWS={kimi:{scores:{},history:[]},deepseek:{scores:{},history:[]},grain:{scores:{},history:[]}};
+  updateLens();
+  ['scorecards','matrix','radar','details','modelDetail','expertScoreTable','auditLog','reportPreview'].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML=''});
+}
+function updateLens(){MODELS.forEach(m=>document.getElementById(m.id+'Len').textContent=cleanLen(document.getElementById(m.id+'Text').value))}
+MODELS.forEach(m=>document.getElementById(m.id+'Text').addEventListener('input',updateLens));
+
+document.getElementById('testDate').value=new Date().toISOString().slice(0,10);
+restoreExamples();
+</script>
+<script type="module" src="assets/static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"version":"2024.11.0","token":"7939e04a4baf43c8b86a560f74aac60e"}'></script>
+</body>
+</html>
