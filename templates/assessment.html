@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-head">
+  <div><h1>{{a.title}}</h1><p>{{a.code}} · {{a.created_at}}</p></div>
+  <div class="actions"><a class="button" href="{{url_for('export_page',token=a.access_token)}}">导出测评结果</a><a class="button primary" href="{{url_for('export_word',token=a.access_token)}}">下载Word报告</a></div>
+</div>
+
+<nav class="result-nav">
+  <a href="#overview">综合结果</a>
+  {% if a.results.get('liangce') %}<a href="#proofreading">良策原文审校</a>{% endif %}
+  <a href="#review">人工复核</a>
+  <a href="{{url_for('export_page',token=a.access_token)}}">导出结果</a>
+</nav>
+
+<section id="overview" class="score-grid">
+{% for total,mid,x in ranks %}<div class="score-card {% if mid=='liangce' %}accent{% endif %}"><span>排名 {{loop.index}}</span><b>{{x.name}}</b><strong>{{"%.1f"|format(total)}}</strong><small>机器初评 {{x.score.total}} / 100{% if a.reviews.get(mid) %} · 已人工复核{% endif %}</small></div>{% endfor %}
+</section>
+
+<section class="panel">
+  <div class="panel-title"><h2>八维得分对比</h2><span>* 为人工修正分</span></div>
+  <div class="table-scroll"><table><thead><tr><th>评价维度</th>{% for mid,x in a.results.items() %}<th>{{x.name}}</th>{% endfor %}</tr></thead><tbody>{% for d in dims %}<tr><td><b>{{d.name}}</b><small>满分{{d.max}}</small></td>{% for mid,x in a.results.items() %}{% set manual=a.reviews.get(mid,{}).get('scores',{}).get(d.key) %}<td>{{manual if manual is not none else x.score[d.key]}}{% if manual is not none %}*{% endif %}</td>{% endfor %}</tr>{% endfor %}</tbody></table></div>
+</section>
+
+{% if a.results.get('liangce') %}
+<section class="panel">
+  <div class="panel-title"><h2>良策智能体：主要不足与改进方向</h2><span>高分文本同样保留改进项</span></div>
+  <div class="defects">{% for d in a.results['liangce'].score.defects %}<article class="defect"><header><b>{{d.dimension}}｜{{d.issue}}</b><span class="{{'high' if d.severity=='高' else 'mid' if d.severity=='中' else 'low'}}">{{d.severity}}风险</span></header><p><strong>发现：</strong>{{d.evidence}}</p><p><strong>改进：</strong>{{d.action}}</p></article>{% endfor %}</div>
+</section>
+
+{% set proof=a.proofreading.get('liangce',{}) %}
+<section id="proofreading" class="panel proof-panel anchor-target">
+  <div class="panel-title"><h2>良策智能体：原文审校</h2><span>共识别 {{proof.get('count',0)}} 项可修改内容</span></div>
+  <p class="section-intro">左侧保留原文并对问题句段进行编号高亮，右侧逐条给出批注意见。审校意见可随Word测评报告一并导出。</p>
+  {% if proof.get('issues') %}
+  <div class="proof-layout">
+    <div class="document-view"><div class="doc-title">原文审校稿</div><div class="doc-body">{% for seg in proof.segments %}{% if seg.issue_ids %}<span class="annotated">{{seg.text}}{% for n in seg.issue_ids %}<sup>{{n}}</sup>{% endfor %}</span>{% else %}{{seg.text}}{% endif %}{% endfor %}</div></div>
+    <aside class="comments"><div class="comments-title">审校意见</div>{% for it in proof.issues %}<article class="comment"><header><span class="comment-no">{{it.id}}</span><b>{{it.category}}</b><em class="{{'high' if it.severity=='高' else 'mid' if it.severity=='中' else 'low'}}">{{it.severity}}</em></header><p class="quote">{{it.original}}</p><p><strong>问题：</strong>{{it.problem}}</p><p><strong>修改建议：</strong>{{it.suggestion}}</p><p class="rewrite"><strong>建议改写：</strong>{{it.rewrite}}</p></article>{% endfor %}</aside>
+  </div>
+  {% else %}<p class="muted">当前规则未识别到明确的句段级问题，仍建议结合专业人员进行事实和政策核验。</p>{% endif %}
+</section>
+{% endif %}
+
+<section class="panel">
+  <div class="panel-title"><h2>评分依据</h2><span>展开查看各维度加分和扣分项</span></div>
+  {% for mid,x in a.results.items() %}<details><summary>{{x.name}}｜机器初评 {{x.score.total}}</summary>{% for d in dims %}<div class="reason-row"><b>{{d.name}}：{{x.score[d.key]}} / {{d.max}}</b><div>{% for rr in x.score.reasons[d.key] %}<span class="reason {% if not rr.positive %}minus{% endif %}">{{'+' if rr.positive else '−'}}{{rr.value}} {{rr.label}}</span>{% endfor %}</div></div>{% endfor %}</details>{% endfor %}
+</section>
+
+<section id="review" class="panel anchor-target">
+  <div class="panel-title"><h2>人工复核</h2><span>可由同行、政府部门或行业专家进行修正</span></div>
+  <p class="muted">机器初始分不会被覆盖删除。人工分只替换对应维度用于最终总分，并保留复核信息。</p>
+  {% for mid,x in a.results.items() %}<details><summary>复核 {{x.name}}</summary><form method="post" action="{{url_for('review',token=a.access_token)}}" class="review-form"><input type="hidden" name="_csrf" value="{{csrf_token()}}"><input type="hidden" name="model_id" value="{{mid}}"><div class="reviewer-grid"><label>复核人<input name="reviewer" value="{{a.reviews.get(mid,{}).get('reviewer','')}}"></label><label>单位<input name="organization" value="{{a.reviews.get(mid,{}).get('organization','')}}"></label><label>身份<select name="reviewer_type"><option>同行/研究人员</option><option>政府部门</option><option>行业专家</option><option>其他</option></select></label></div><div class="table-scroll"><table><thead><tr><th>维度</th><th>机器分</th><th>人工分</th><th>修正依据</th></tr></thead><tbody>{% for d in dims %}<tr><td>{{d.name}}</td><td>{{x.score[d.key]}}</td><td><input type="number" step="0.1" min="0" max="{{d.max}}" name="score_{{d.key}}" value="{{a.reviews.get(mid,{}).get('scores',{}).get(d.key,'')}}"></td><td><input name="reason_{{d.key}}" value="{{a.reviews.get(mid,{}).get('reasons',{}).get(d.key,'')}}"></td></tr>{% endfor %}</tbody></table></div><label>总体意见<textarea name="note">{{a.reviews.get(mid,{}).get('note','')}}</textarea></label><button class="primary">保存复核</button>{% if a.reviews.get(mid,{}).get('history') %}<div class="history"><b>复核记录</b>{% for h in a.reviews[mid].history|reverse %}<p>{{h.time}} · {{h.reviewer}}{% if h.organization %} · {{h.organization}}{% endif %}</p>{% endfor %}</div>{% endif %}</form></details>{% endfor %}
+</section>
+
+<section id="export-summary" class="panel export-callout">
+  <div><h2>导出测评结果</h2><p>可导出完整Word报告、评分CSV和良策审校清单。需要打印留档时，可在导出页面保存为PDF。</p></div>
+  <a class="button primary" href="{{url_for('export_page',token=a.access_token)}}">进入导出页面</a>
+</section>
+{% endblock %}

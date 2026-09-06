@@ -1,0 +1,11 @@
+AI政策文本测评系统
+
+开发团队快速部署：
+1. 解压本文件包
+2. 复制 .env.example 为 .env
+3. 把 SECRET_KEY 改成随机长字符串
+4. 执行 docker compose up -d --build
+5. 浏览器访问 http://服务器IP:8088
+
+系统不设注册登录，打开即用。
+详细说明见 README_开发部署.md

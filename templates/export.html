@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-head">
+  <div><h1>导出测评结果</h1><p>{{a.code}} · {{a.title}}</p></div>
+  <div class="actions"><a class="button" href="{{url_for('assessment',token=a.access_token)}}">返回测评结果</a></div>
+</div>
+
+<section class="panel export-page">
+  <div class="panel-title"><h2>文件导出</h2><span>根据使用场景选择相应格式</span></div>
+  <div class="export-grid">
+    <article class="export-card"><div class="export-icon">W</div><h3>完整测评报告</h3><p>包含横向排名、八维评分、良策不足、原文审校意见及方法说明，适合汇报和留档。</p><a class="primary" href="{{url_for('export_word',token=a.access_token)}}">下载 Word</a></article>
+    <article class="export-card"><div class="export-icon">表</div><h3>评分结果数据</h3><p>导出各模型机器初评、人工复核后总分及八个维度分数，便于后续统计分析。</p><a class="primary" href="{{url_for('export_csv',token=a.access_token)}}">下载 CSV</a></article>
+    <article class="export-card"><div class="export-icon">批</div><h3>良策审校清单</h3><p>单独导出逐句审校意见，包括原文、问题类型、风险等级、问题说明、修改建议和建议改写。</p>{% if a.proofreading.get('liangce',{}).get('issues') %}<a class="primary" href="{{url_for('export_proof_csv',token=a.access_token)}}">下载审校 CSV</a>{% else %}<span class="disabled-button">暂无审校项</span>{% endif %}</article>
+    <article class="export-card"><div class="export-icon">P</div><h3>打印 / PDF</h3><p>当前页面可直接打印或另存为PDF。适用于归档、内部交流或提交评审材料。</p><button id="print-page" class="primary">打印 / 保存PDF</button></article>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="panel-title"><h2>结果摘要</h2><span>导出前快速核对</span></div>
+  <div class="score-grid">{% for total,mid,x in ranks %}<div class="score-card {% if mid=='liangce' %}accent{% endif %}"><span>排名 {{loop.index}}</span><b>{{x.name}}</b><strong>{{"%.1f"|format(total)}}</strong><small>机器初评 {{x.score.total}} / 100{% if a.reviews.get(mid) %} · 已人工复核{% endif %}</small></div>{% endfor %}</div>
+</section>
+
+{% if a.results.get('liangce') %}
+<section class="panel">
+  <div class="panel-title"><h2>良策审校摘要</h2><span>{{a.proofreading.get('liangce',{}).get('count',0)}} 项</span></div>
+  <div class="defects">{% for it in a.proofreading.get('liangce',{}).get('issues',[])[:6] %}<article class="defect"><header><b>批注{{it.id}}｜{{it.category}}</b><span class="{{'high' if it.severity=='高' else 'mid' if it.severity=='中' else 'low'}}">{{it.severity}}</span></header><p><strong>原文：</strong>{{it.original}}</p><p><strong>修改：</strong>{{it.suggestion}}</p></article>{% endfor %}</div>
+  {% if a.proofreading.get('liangce',{}).get('count',0)>6 %}<p class="muted">此处仅展示前6项，完整内容见Word报告或审校CSV。</p>{% endif %}
+</section>
+{% endif %}
+{% endblock %}

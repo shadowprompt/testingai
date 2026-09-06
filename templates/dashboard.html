@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>政策文本横向测评</h1>
+    <p>在相同题目和材料条件下，对不同模型输出进行结构化评价，并对良策智能体形成逐句审校和修改建议。</p>
+  </div>
+</div>
+
+<section class="panel feature-panel">
+  <div class="panel-title"><h2>主要功能</h2><span>完成一次测评后，可进入全部结果功能</span></div>
+  <div class="feature-grid">
+    <article class="feature-card active-feature">
+      <span class="feature-no">01</span>
+      <h3>横向测评</h3>
+      <p>对良策智能体、DeepSeek、Kimi、GLM5.3、Qwen3.7、HY3进行同题比较，形成总分与八维分项结果。</p>
+      <b>当前页面即可使用</b>
+    </article>
+    <article class="feature-card">
+      <span class="feature-no">02</span>
+      <h3>良策原文审校</h3>
+      <p>对良策原文逐句识别问题，采用文档批注方式高亮，并给出问题类型、风险等级、修改意见和建议改写。</p>
+      <b>完成测评后进入</b>
+    </article>
+    <article class="feature-card">
+      <span class="feature-no">03</span>
+      <h3>人工复核</h3>
+      <p>同行、政府部门或行业专家可对各维度进行人工修正，保留机器初评与人工复核记录。</p>
+      <b>完成测评后进入</b>
+    </article>
+    <article class="feature-card">
+      <span class="feature-no">04</span>
+      <h3>测评结果导出</h3>
+      <p>支持导出Word测评报告、CSV结构化评分数据和良策审校清单，并可打印保存为PDF。</p>
+      <b>完成测评后进入</b>
+    </article>
+  </div>
+</section>
+
+<form method="post" action="{{url_for('create_assessment')}}" enctype="multipart/form-data">
+<input type="hidden" name="_csrf" value="{{csrf_token()}}">
+<section class="panel">
+  <div class="panel-title"><h2>测评任务</h2><span>选择政策领域，填写同一评价题目</span></div>
+  <div class="form-grid">
+    <label class="wide">测评题目<input name="title" placeholder="例如：关于完善某项公共政策的咨政报告" required></label>
+    <label>测评编号<input name="code" value="POL-2026-001"></label>
+  </div>
+  <div class="chips">{% for key,a in areas.items() %}<label><input type="checkbox" name="areas" value="{{key}}" {% if key=='general' %}checked{% endif %}>{{a.name}}</label>{% endfor %}</div>
+</section>
+
+<section class="panel">
+  <div class="panel-title"><h2>评价对象</h2><span>可粘贴文本，也可上传原文；上传文件优先</span></div>
+  <div class="model-grid">
+    {% for m in models %}
+    <article class="model-card {% if m.id=='liangce' %}highlight{% endif %}">
+      <header>
+        <div><b>{{m.name}}</b>{% if m.id=='liangce' %}<small>同步生成原文审校与修改建议</small>{% else %}<small>横向比较对象</small>{% endif %}</div>
+        <span>{{loop.index}}</span>
+      </header>
+      <textarea class="model-text" name="text_{{m.id}}" placeholder="粘贴 {{m.name}} 输出文本"></textarea>
+      <footer><label class="file-label">上传原文<input class="file-input" type="file" name="file_{{m.id}}" accept=".txt,.md,.docx,.pdf,.html,.htm"></label><span class="char-count">0 字</span></footer>
+    </article>
+    {% endfor %}
+  </div>
+  <button class="primary submit">开始测评</button>
+</section>
+</form>
+
+{% if recent %}
+<section class="panel">
+  <div class="panel-title"><h2>最近测评</h2><span>可直接进入结果、审校、复核或导出</span></div>
+  <div class="table-scroll"><table><thead><tr><th>编号</th><th>题目</th><th>时间</th><th>功能入口</th></tr></thead><tbody>
+  {% for r in recent %}
+  <tr><td>{{r.code}}</td><td>{{r.title}}</td><td>{{r.created_at}}</td><td class="record-actions">
+    <a class="linkbtn" href="{{url_for('assessment',token=r.access_token)}}#overview">查看结果</a>
+    <a class="linkbtn" href="{{url_for('assessment',token=r.access_token)}}#proofreading">原文审校</a>
+    <a class="linkbtn" href="{{url_for('assessment',token=r.access_token)}}#review">人工复核</a>
+    <a class="linkbtn" href="{{url_for('export_page',token=r.access_token)}}">导出结果</a>
+  </td></tr>
+  {% endfor %}
+  </tbody></table></div>
+</section>
+{% endif %}
+{% endblock %}
