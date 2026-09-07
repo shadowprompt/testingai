@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-head">
+  <div><h1>纵向测评结果</h1><p>{{v.code}} · {{v.title}} · {{v.created_at}}</p></div>
+  <div class="actions"><a class="button" href="{{url_for('version_csv',token=v.access_token)}}">导出CSV</a><a class="button primary" href="{{url_for('version_word',token=v.access_token)}}">下载Word报告</a></div>
+</div>
+
+<section class="version-summary-grid">
+  <article class="version-score previous-score"><span>上一版本</span><strong>{{"%.1f"|format(v.previous_score.total)}}</strong><small>/100</small></article>
+  <article class="version-arrow"><b>→</b><span>综合变化</span><strong class="{{'up' if total_delta>0 else 'down' if total_delta<0 else 'flat'}}">{{"%+.1f"|format(total_delta)}} 分</strong></article>
+  <article class="version-score current-score"><span>当前版本</span><strong>{{"%.1f"|format(v.current_score.total)}}</strong><small>/100</small></article>
+</section>
+
+<section class="panel">
+  <div class="panel-title"><h2>八维变化</h2><span>正值表示当前版本较上一版本提高</span></div>
+  <div class="table-scroll"><table><thead><tr><th>评价维度</th><th>上一版本</th><th class="target-col">当前版本</th><th>变化</th><th>判断</th></tr></thead><tbody>
+  {% for d in dims %}{% set dv=delta[d.key] %}<tr><td><b>{{d.name}}</b><small>满分{{d.max}}</small></td><td>{{v.previous_score[d.key]}}</td><td class="target-col">{{v.current_score[d.key]}}</td><td class="delta {{'up' if dv>0 else 'down' if dv<0 else 'flat'}}">{{"%+.1f"|format(dv)}}</td><td>{{'改善' if dv>=1 else '小幅改善' if dv>0 else '基本持平' if dv==0 else '有所回落'}}</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+
+<section class="panel">
+  <div class="panel-title"><h2>当前版本主要不足与继续修改方向</h2><span>纵向提升不等于不存在问题</span></div>
+  <div class="defects">{% for d in v.current_score.defects %}<article class="defect"><header><b>{{d.dimension}}｜{{d.issue}}</b><span class="{{'high' if d.severity=='高' else 'mid' if d.severity=='中' else 'low'}}">{{d.severity}}风险</span></header><p><strong>发现：</strong>{{d.evidence}}</p><p><strong>建议：</strong>{{d.action}}</p></article>{% endfor %}</div>
+</section>
+
+{% set proof=v.current_proofreading %}
+<section class="panel proof-panel">
+  <div class="panel-title"><h2>当前版本原文审校</h2><span>共识别 {{proof.get('count',0)}} 项可修改内容</span></div>
+  {% if proof.get('issues') %}<div class="proof-layout"><div class="document-view"><div class="doc-title">当前版本审校稿</div><div class="doc-body">{% for seg in proof.segments %}{% if seg.issue_ids %}<span class="annotated">{{seg.text}}{% for n in seg.issue_ids %}<sup>{{n}}</sup>{% endfor %}</span>{% else %}{{seg.text}}{% endif %}{% endfor %}</div></div><aside class="comments"><div class="comments-title">审校意见</div>{% for it in proof.issues %}<article class="comment"><header><span class="comment-no">{{it.id}}</span><b>{{it.category}}</b><em class="{{'high' if it.severity=='高' else 'mid' if it.severity=='中' else 'low'}}">{{it.severity}}</em></header><p class="quote">{{it.original}}</p><p><strong>问题：</strong>{{it.problem}}</p><p><strong>修改建议：</strong>{{it.suggestion}}</p><p class="rewrite"><strong>建议改写：</strong>{{it.rewrite}}</p></article>{% endfor %}</aside></div>{% else %}<p class="muted">当前规则未识别到明确句段问题，仍建议进行事实和政策核验。</p>{% endif %}
+</section>
+{% endblock %}

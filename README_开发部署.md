@@ -75,8 +75,8 @@ SECURITY.md
 
 ## 结果页面新增路由
 
-- `/a/<token>`：综合测评结果、良策原文审校、人工复核
+- `/a/<token>`：综合测评结果、待测政策文本审校、人工复核
 - `/a/<token>/export`：独立导出页面
 - `/a/<token>/word`：Word完整报告
 - `/a/<token>/csv`：评分CSV
-- `/a/<token>/proofreading.csv`：良策审校清单CSV
+- `/a/<token>/proofreading.csv`：政策文本审校清单CSV

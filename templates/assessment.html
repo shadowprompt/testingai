@@ -7,29 +7,29 @@
 
 <nav class="result-nav">
   <a href="#overview">综合结果</a>
-  {% if a.results.get('liangce') %}<a href="#proofreading">良策原文审校</a>{% endif %}
+  {% if a.results.get('target') %}<a href="#proofreading">待测政策文本审校</a>{% endif %}
   <a href="#review">人工复核</a>
   <a href="{{url_for('export_page',token=a.access_token)}}">导出结果</a>
 </nav>
 
 <section id="overview" class="score-grid">
-{% for total,mid,x in ranks %}<div class="score-card {% if mid=='liangce' %}accent{% endif %}"><span>排名 {{loop.index}}</span><b>{{x.name}}</b><strong>{{"%.1f"|format(total)}}</strong><small>机器初评 {{x.score.total}} / 100{% if a.reviews.get(mid) %} · 已人工复核{% endif %}</small></div>{% endfor %}
+{% for total,mid,x in ranks %}<div class="score-card {% if mid=='target' %}accent target-result{% endif %}"><span>排名 {{loop.index}}</span><b>{{x.name}}</b><strong>{{"%.1f"|format(total)}}</strong><small>机器初评 {{x.score.total}} / 100{% if a.reviews.get(mid) %} · 已人工复核{% endif %}</small></div>{% endfor %}
 </section>
 
 <section class="panel">
   <div class="panel-title"><h2>八维得分对比</h2><span>* 为人工修正分</span></div>
-  <div class="table-scroll"><table><thead><tr><th>评价维度</th>{% for mid,x in a.results.items() %}<th>{{x.name}}</th>{% endfor %}</tr></thead><tbody>{% for d in dims %}<tr><td><b>{{d.name}}</b><small>满分{{d.max}}</small></td>{% for mid,x in a.results.items() %}{% set manual=a.reviews.get(mid,{}).get('scores',{}).get(d.key) %}<td>{{manual if manual is not none else x.score[d.key]}}{% if manual is not none %}*{% endif %}</td>{% endfor %}</tr>{% endfor %}</tbody></table></div>
+  <div class="table-scroll"><table><thead><tr><th>评价维度</th>{% for mid,x in a.results.items() %}<th class="{% if mid=='target' %}target-col{% endif %}">{{x.name}}</th>{% endfor %}</tr></thead><tbody>{% for d in dims %}<tr><td><b>{{d.name}}</b><small>满分{{d.max}}</small></td>{% for mid,x in a.results.items() %}{% set manual=a.reviews.get(mid,{}).get('scores',{}).get(d.key) %}<td class="{% if mid=='target' %}target-col{% endif %}">{{manual if manual is not none else x.score[d.key]}}{% if manual is not none %}*{% endif %}</td>{% endfor %}</tr>{% endfor %}</tbody></table></div>
 </section>
 
-{% if a.results.get('liangce') %}
+{% if a.results.get('target') %}
 <section class="panel">
-  <div class="panel-title"><h2>良策智能体：主要不足与改进方向</h2><span>高分文本同样保留改进项</span></div>
-  <div class="defects">{% for d in a.results['liangce'].score.defects %}<article class="defect"><header><b>{{d.dimension}}｜{{d.issue}}</b><span class="{{'high' if d.severity=='高' else 'mid' if d.severity=='中' else 'low'}}">{{d.severity}}风险</span></header><p><strong>发现：</strong>{{d.evidence}}</p><p><strong>改进：</strong>{{d.action}}</p></article>{% endfor %}</div>
+  <div class="panel-title"><h2>待测政策文本：主要不足与改进方向</h2><span>高分文本同样保留改进项</span></div>
+  <div class="defects">{% for d in a.results['target'].score.defects %}<article class="defect"><header><b>{{d.dimension}}｜{{d.issue}}</b><span class="{{'high' if d.severity=='高' else 'mid' if d.severity=='中' else 'low'}}">{{d.severity}}风险</span></header><p><strong>发现：</strong>{{d.evidence}}</p><p><strong>改进：</strong>{{d.action}}</p></article>{% endfor %}</div>
 </section>
 
-{% set proof=a.proofreading.get('liangce',{}) %}
+{% set proof=a.proofreading.get('target',{}) %}
 <section id="proofreading" class="panel proof-panel anchor-target">
-  <div class="panel-title"><h2>良策智能体：原文审校</h2><span>共识别 {{proof.get('count',0)}} 项可修改内容</span></div>
+  <div class="panel-title"><h2>待测政策文本：原文审校</h2><span>共识别 {{proof.get('count',0)}} 项可修改内容</span></div>
   <p class="section-intro">左侧保留原文并对问题句段进行编号高亮，右侧逐条给出批注意见。审校意见可随Word测评报告一并导出。</p>
   {% if proof.get('issues') %}
   <div class="proof-layout">
@@ -52,7 +52,7 @@
 </section>
 
 <section id="export-summary" class="panel export-callout">
-  <div><h2>导出测评结果</h2><p>可导出完整Word报告、评分CSV和良策审校清单。需要打印留档时，可在导出页面保存为PDF。</p></div>
+  <div><h2>导出测评结果</h2><p>可导出完整Word报告、评分CSV和政策文本审校清单。需要打印留档时，可在导出页面保存为PDF。</p></div>
   <a class="button primary" href="{{url_for('export_page',token=a.access_token)}}">进入导出页面</a>
 </section>
 {% endblock %}

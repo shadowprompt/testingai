@@ -11,3 +11,37 @@
 @media(max-width:1180px){.feature-grid,.export-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:720px){.feature-grid,.export-grid{grid-template-columns:1fr}.result-nav{position:static}.export-callout{align-items:flex-start;flex-direction:column}}
 @media print{.sidebar,.topbar,.page-head,.result-nav,.actions,.export-page .panel-title span{display:none!important}.layout{display:block}.content{padding:0;max-width:none}.panel,.score-card{box-shadow:none}.export-card button,.export-card a{display:none!important}}
+
+/* 字体增强与待测文本视觉区分 */
+body{font-size:16px}
+h1{font-size:30px!important}
+h2{font-size:22px!important}
+h3{font-size:18px!important}
+p,li,.panel,.button{font-size:16px}
+.result-card.tested-text,.model-card.tested-text{background:#eaf5ee!important;border:2px solid #4f8066!important}
+.badge-tested{background:#d9ecdf;color:#24533d;padding:4px 10px;border-radius:12px;font-weight:700}
+
+
+/* 通用政策版：阅读字号与重点对象区分 */
+body{font-size:16px}
+.brand b{font-size:16px}.brand span{font-size:12px}.sidebar nav a{font-size:15px}.side-note{font-size:12.5px}.topbar{font-size:14px}
+.page-head h1{font-size:31px}.page-head p{font-size:15px}.panel-title h2{font-size:20px}.panel-title span{font-size:13px}
+label,input,select,textarea,.button,.primary,.linkbtn{font-size:14px}.chips label{font-size:13.5px}
+.model-card header b{font-size:16px}.model-card header small{font-size:12.5px}.model-card header span{font-size:12px}.file-label,.char-count{font-size:12.5px}
+.feature-grid{grid-template-columns:repeat(3,1fr)}.feature-card{min-height:170px;color:inherit;text-decoration:none}.feature-no{font-size:12px}.feature-card h3{font-size:18px}.feature-card p{font-size:14px;line-height:1.7}.feature-card b{font-size:12.5px}
+.score-card span,.score-card small{font-size:12.5px}.score-card b{font-size:16px}.score-card strong{font-size:34px}
+table{font-size:14px}.defect header b{font-size:14px}.defect header span,.comment header em{font-size:11.5px}.defect p{font-size:13.5px}.muted,.section-intro{font-size:13.5px}
+.doc-title{font-size:12px}.doc-body{font-size:16px}.comments-title{font-size:15px}.comment header b{font-size:14px}.comment-no{font-size:11px}.comment p{font-size:13px}.reason-row b{font-size:13.5px}.reason{font-size:11.5px}.history{font-size:12.5px}.method-card span,.method-card small{font-size:12px}.method-card b{font-size:14px}.steps li{font-size:14px}
+.export-card h3{font-size:16px}.export-card p{font-size:13.5px}.export-card .primary,.export-card button.primary,.disabled-button{font-size:13px}.result-nav a{font-size:13px}
+
+/* 待测政策文本在横向结果中的视觉区分 */
+.model-card.highlight{background:#f3f8f6;border:2px solid #6f9b83;box-shadow:0 4px 16px rgba(49,93,73,.08)}
+.model-card.highlight header{background:#e8f2ed}
+.score-card.target-result{background:#edf6f1;border:2px solid #6f9b83;box-shadow:0 4px 14px rgba(49,93,73,.08)}
+.target-col{background:#eef6f2!important;border-left:1px solid #c8ddd1;border-right:1px solid #c8ddd1;font-weight:600;color:#294f3d}
+
+/* 纵向测评 */
+.version-panel{border-color:#cbdcd3}.version-input-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}.version-text-card{border:1px solid #dbe3df;border-radius:10px;overflow:hidden;background:#fff}.version-text-card header{padding:12px 14px;background:#f7f9f8;border-bottom:1px solid #e4e9e6}.version-text-card header b{font-size:16px}.version-text-card header small{display:block;font-size:12.5px;color:#7b8881;margin-top:3px}.version-text-card textarea{border:0;border-radius:0;margin:0;min-height:230px;font-size:15px;line-height:1.75}.version-text-card footer{padding:9px 13px;border-top:1px solid #e4e9e6;background:#fafcfb}.current-version{border:2px solid #6f9b83;background:#f3f8f6}.current-version header{background:#e8f2ed}
+.version-summary-grid{display:grid;grid-template-columns:1fr .7fr 1fr;gap:12px;margin-bottom:16px}.version-score,.version-arrow{background:#fff;border:1px solid #dfe5e1;border-radius:10px;padding:20px;text-align:center}.version-score span,.version-arrow span{display:block;color:#718078;font-size:14px}.version-score strong{display:inline-block;font-size:42px;color:#315d49;margin-top:5px}.version-score small{font-size:14px;color:#829087}.current-score{background:#edf6f1;border:2px solid #6f9b83}.version-arrow{display:flex;flex-direction:column;align-items:center;justify-content:center}.version-arrow b{font-size:28px;color:#829087}.version-arrow strong{font-size:24px;margin-top:5px}.up{color:#247247!important}.down{color:#ad3f35!important}.flat{color:#68766e!important}.delta{font-weight:700}
+@media(max-width:980px){.feature-grid{grid-template-columns:repeat(2,1fr)}.version-input-grid,.version-summary-grid{grid-template-columns:1fr}}
+@media(max-width:620px){.feature-grid{grid-template-columns:1fr}}

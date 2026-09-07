@@ -26,4 +26,18 @@ def init_db():
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
         CREATE INDEX IF NOT EXISTS idx_assessments_token ON assessments(access_token);
+        CREATE TABLE IF NOT EXISTS version_assessments(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            access_token TEXT UNIQUE NOT NULL,
+            code TEXT NOT NULL,
+            title TEXT NOT NULL,
+            areas TEXT NOT NULL,
+            previous_text TEXT NOT NULL,
+            current_text TEXT NOT NULL,
+            previous_score TEXT NOT NULL,
+            current_score TEXT NOT NULL,
+            current_proofreading TEXT NOT NULL DEFAULT '{}',
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
+        CREATE INDEX IF NOT EXISTS idx_version_assessments_token ON version_assessments(access_token);
         """)
